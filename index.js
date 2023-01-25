@@ -7,39 +7,43 @@ const port = 3000;
 
 
 const server = http.createServer((req, res) => {
+  const redirectTo404 = () => {
+    fs.readFile('./404.html', (err, data) => {
+      if(err) {
+        console.log(err);
+      }
+      res.setHeader('Content-Length', data.length);
+      res.statusCode = 404;
+      res.write(data);
+      return res.end();
+    });
+  }
+
   res.setHeader('Content-Type', 'text/html');
   
   if(req.url === '/') {
-    const html = fs.readFileSync('./index.html', (err, data) => {
+    fs.readFile('./index.html', (err, data) => {
       if(err) {
-        res.end();
+        console.log(err);
+        return;
       }
       res.setHeader('Content-Length', data.length);
       res.statusCode = 200;
+      res.write(data);
+      return res.end();
     });
-    res.write(html);
   } else {
-    try {
-      const html = fs.readFileSync(`.${req.url}.html`, (err, data) => {
+      fs.readFile(`.${req.url}.html`, (err, data) => {
         if(err) {
-          res.end();
+          err.code === 'ENOENT' ? redirectTo404() : console.log(err);
+          return;
         }
         res.setHeader('Content-Length', data.length);
+        res.statusCode = 200;
+        res.write(data);
+        return res.end();
       });
-      res.statusCode = 200;
-      res.write(html);
-    } catch(error) {
-      const html404 = fs.readFileSync('./404.html', (err, data) => {
-        if(err) {
-          res.end();
-        }
-        res.setHeader('Content-Length', data.length);
-      });
-      res.statusCode = 404;
-      res.write(html404);
-    }
   }
-  res.end();
 });
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
