@@ -1,56 +1,25 @@
-import http from 'http';
-import fs from 'fs';
+import express from "express";
+import path from 'path';
 
-const hostname = '127.0.0.1';
+const app = express();
 const port = 3000;
 
+app.get('/', (req, res, next) => {
+  res.sendFile(path.resolve('index.html'), (err) => {
+    if(err) {
+      return next();
+    }
+  });
+})
 
+app.get('/:pagename', (req, res, next) => {
+  res.sendFile(path.resolve(`${req.params.pagename}.html`), {}, (err) => {
+    if(err) {
+      err.code === 'ENOENT' ? res.sendFile(path.resolve('404.html')): next(err);
+    }
+  })
+})
 
-const server = http.createServer((req, res) => {
-  const redirectTo404 = () => {
-    fs.readFile('./404.html', (err, data) => {
-      if(err) {
-        console.log(err);
-      }
-      res.setHeader('Content-Length', data.length);
-      res.statusCode = 404;
-      res.write(data);
-      return res.end();
-    });
-  }
-
-  res.setHeader('Content-Type', 'text/html');
-  
-  if(req.url === '/') {
-    fs.readFile('./index.html', (err, data) => {
-      if(err) {
-        console.log(err);
-        return;
-      }
-      res.setHeader('Content-Length', data.length);
-      res.statusCode = 200;
-      res.write(data);
-      return res.end();
-    });
-  } else {
-      fs.readFile(`.${req.url}.html`, (err, data) => {
-        if(err) {
-          err.code === 'ENOENT' ? redirectTo404() : console.log(err);
-          return;
-        }
-        res.setHeader('Content-Length', data.length);
-        res.statusCode = 200;
-        res.write(data);
-        return res.end();
-      });
-  }
-});
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
-});
-
-
-
-
-
-
+app.listen(port, () => {
+  console.log(`app listening on port ${port}`);
+})

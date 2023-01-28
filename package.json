@@ -1,4 +1,27 @@
 {
   "type": "module",
-  "private": true
+  "private": true,
+  "name": "backend-basics",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sonwemt/backend-basics.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sonwemt/backend-basics/issues"
+  },
+  "homepage": "https://github.com/sonwemt/backend-basics#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
 }
